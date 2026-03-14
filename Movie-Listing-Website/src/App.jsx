@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import tmdbApi from "./services/tmdbApi";
 import MovieCard from "./components/MovieCard";
+import MovieDetail from "./components/MovieDetail";
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMovieId, setSelectedMovieId] = useState(null);
 
   useEffect(() => {
     loadMovies();
@@ -29,6 +31,11 @@ function App() {
     e.preventDefault();
     setCurrentPage(1);
   };
+
+  const handleMovieClick = (movieId) => {
+    setSelectedMovieId(movieId);
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -60,12 +67,15 @@ function App() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
           </div>
         ) : (
-            <>
-              <p className="text-gray-400 mb-4">{movies.length} movies found</p>
+          <>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {movies.map(movie => (
-                <MovieCard key={movie.id} movie={movie} />
+              {movies.map((movie) => (
+                <MovieCard
+                  key={movie.id}
+                  movie={movie}
+                  onClick={handleMovieClick}
+                />
               ))}
             </div>
 
@@ -82,6 +92,12 @@ function App() {
           </>
         )}
       </div>
+      {selectedMovieId && (
+        <MovieDetail 
+          movieId={selectedMovieId} 
+          onClose={() => setSelectedMovieId(null)} 
+        />
+      )}
     </div>
   );
 }
