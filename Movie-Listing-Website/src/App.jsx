@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import tmdbApi from "./services/tmdbApi";
 import MovieCard from "./components/MovieCard";
 import MovieDetail from "./components/MovieDetail";
+import FilterBar from "./components/FilterBar";
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -9,10 +10,11 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMovieId, setSelectedMovieId] = useState(null);
+  const [activeFilters, setActiveFilters] = useState({ genre: "", year: "", sort: "popularity" });
 
   useEffect(() => {
     loadMovies();
-  }, [currentPage, searchQuery]);
+  }, [currentPage, searchQuery,activeFilters]);
 
   const loadMovies = async () => {
     setLoading(true);
@@ -20,6 +22,11 @@ function App() {
 
     if (searchQuery) {
       results = await tmdbApi.searchMovies(searchQuery, currentPage);
+
+    } else if (activeFilters.genre || activeFilters.year || activeFilters.sort !== "popularity") {
+    
+      results = await tmdbApi.getMoviesByFilter(activeFilters, currentPage);
+      
     } else {
       results = await tmdbApi.getPopularMovies(currentPage);
     }
@@ -36,6 +43,10 @@ function App() {
     setSelectedMovieId(movieId);
   };
 
+  const handleFilterChange = (filters) => {  
+    setActiveFilters(filters);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -62,9 +73,16 @@ function App() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
+        <FilterBar onFilterChange={handleFilterChange} />
+
         {loading ? (
           <div className="text-center text-white py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="text-center text-gray-400 py-20">
+            <i className="fa-solid fa-film text-5xl mb-4 block"></i>
+            <p className="text-xl">No movies found. Try different filters.</p>
           </div>
         ) : (
           <>
