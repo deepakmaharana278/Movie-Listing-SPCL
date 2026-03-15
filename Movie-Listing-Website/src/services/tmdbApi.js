@@ -65,7 +65,6 @@ const tmdbApi = {
   },
 
   getImageUrl: (path, size = "w500") => {
-    const IMAGE_BASE_URL = import.meta.env.IMAGE_BASE_URL;
     if (!path) return "https://placehold.co/500x750/2d3748/ffffff?text=No+Poster";
     return `${IMAGE_BASE_URL}/${size}${path}`;
   },
