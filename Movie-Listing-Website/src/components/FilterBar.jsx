@@ -1,99 +1,128 @@
 import React, { useState } from "react";
 
-const GENRES = [
-  { id: 28, name: "Action" },
-  { id: 35, name: "Comedy" },
-  { id: 18, name: "Drama" },
-  { id: 27, name: "Horror" },
-  { id: 10749, name: "Romance" },
-  { id: 878, name: "Sci-Fi" },
-  { id: 53, name: "Thriller" },
-  { id: 16, name: "Animation" },
-];
+const FilterBar = ({ onFilterChange, isMobile = false }) => {
+  const [filters, setFilters] = useState({
+    genre: "",
+    year: "",
+    sort: "popularity",
+  });
 
-const FilterBar = ({ onFilterChange }) => {
-  const [selectedGenre, setSelectedGenre] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [sortBy, setSortBy] = useState("popularity");
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
-
-  const handleChange = (key, value) => {
-    const updates = { genre: selectedGenre, year: selectedYear, sort: sortBy };
-    updates[key] = value;
-
-    if (key === "genre") setSelectedGenre(value);
-    if (key === "year") setSelectedYear(value);
-    if (key === "sort") setSortBy(value);
-
-    onFilterChange(updates);
+  const handleFilterChange = (key, value) => {
+    const newFilters = { ...filters, [key]: value };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
-  const handleReset = () => {
-    setSelectedGenre("");
-    setSelectedYear("");
-    setSortBy("popularity");
-    onFilterChange({ genre: "", year: "", sort: "popularity" });
-  };
+  const genres = [
+    { id: 28, name: "Action" },
+    { id: 12, name: "Adventure" },
+    { id: 16, name: "Animation" },
+    { id: 35, name: "Comedy" },
+    { id: 80, name: "Crime" },
+    { id: 18, name: "Drama" },
+    { id: 14, name: "Fantasy" },
+    { id: 27, name: "Horror" },
+    { id: 10749, name: "Romance" },
+    { id: 878, name: "Sci-Fi" },
+    { id: 53, name: "Thriller" },
+  ];
+
+  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
+
+  const sortOptions = [
+    { value: "popularity", label: "Popularity" },
+    { value: "vote_average", label: "Rating" },
+    { value: "release_date", label: "Release Date" },
+    { value: "revenue", label: "Revenue" },
+  ];
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-6 flex flex-wrap gap-3 items-center">
-      {/* Genre Filter */}
-      <div className="flex flex-col gap-1">
-        <label className="text-gray-400 text-xs uppercase tracking-wider">Genre</label>
+    <div className={`${isMobile ? "space-y-3" : "flex items-center gap-2 bg-gray-800/50 p-2 rounded-2xl backdrop-blur-sm"}`}>
+      {!isMobile && (
+        <div className="text-gray-400 px-3 text-sm font-medium flex items-center gap-2">
+          <i className="fa-solid fa-sliders text-purple-400"></i>
+          <span>Filter by:</span>
+        </div>
+      )}
+
+      <div className={`relative ${isMobile ? "w-full" : "min-w-35"}`}>
         <select
-          value={selectedGenre}
-          onChange={(e) => handleChange("genre", e.target.value)}
-          className="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          value={filters.genre}
+          onChange={(e) => handleFilterChange("genre", e.target.value)}
+          className={`w-full bg-gray-800 text-white pl-8 pr-8 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 cursor-pointer hover:bg-gray-750 transition-all text-sm appearance-none`}
         >
-          <option value="">All Genres</option>
-          {GENRES.map((g) => (
-            <option key={g.id} value={g.id}>{g.name}</option>
+          <option value="" className="bg-gray-800">
+            All Genres
+          </option>
+          {genres.map((genre) => (
+            <option key={genre.id} value={genre.id} className="bg-gray-800">
+              {genre.name}
+            </option>
           ))}
         </select>
+        <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-400 pointer-events-none">
+          <i className="fa-solid fa-film text-xs"></i>
+        </div>
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+          <i className="fa-solid fa-chevron-down text-xs"></i>
+        </div>
       </div>
 
-      {/* Year Filter */}
-      <div className="flex flex-col gap-1">
-        <label className="text-gray-400 text-xs uppercase tracking-wider">Year</label>
+      <div className={`relative ${isMobile ? "w-full" : "w-30"}`}>
         <select
-          value={selectedYear}
-          onChange={(e) => handleChange("year", e.target.value)}
-          className="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          value={filters.year}
+          onChange={(e) => handleFilterChange("year", e.target.value)}
+          className={`w-full bg-gray-800 text-white pl-8 pr-8 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 cursor-pointer hover:bg-gray-750 transition-all text-sm appearance-none`}
         >
-          <option value="">All Years</option>
-          {years.map((y) => (
-            <option key={y} value={y}>{y}</option>
+          <option value="" className="bg-gray-800">
+            Year
+          </option>
+          {years.map((year) => (
+            <option key={year} value={year} className="bg-gray-800">
+              {year}
+            </option>
           ))}
         </select>
+        <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-400 pointer-events-none">
+          <i className="fa-solid fa-calendar text-xs"></i>
+        </div>
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+          <i className="fa-solid fa-chevron-down text-xs"></i>
+        </div>
       </div>
 
-      {/* Sort By */}
-      <div className="flex flex-col gap-1">
-        <label className="text-gray-400 text-xs uppercase tracking-wider">Sort By</label>
+      <div className={`relative ${isMobile ? "w-full" : "min-w-35"}`}>
         <select
-          value={sortBy}
-          onChange={(e) => handleChange("sort", e.target.value)}
-          className="bg-gray-700 text-white px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+          value={filters.sort}
+          onChange={(e) => handleFilterChange("sort", e.target.value)}
+          className={`w-full bg-gray-800 text-white pl-8 pr-8 py-2.5 rounded-xl border border-gray-700 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 cursor-pointer hover:bg-gray-750 transition-all text-sm appearance-none`}
         >
-          <option value="popularity">Most Popular</option>
-          <option value="rating">Highest Rated</option>
-          <option value="release_date">Newest First</option>
-          <option value="title">A–Z</option>
+          {sortOptions.map((option) => (
+            <option key={option.value} value={option.value} className="bg-gray-800">
+              {option.label}
+            </option>
+          ))}
         </select>
+        <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-400 pointer-events-none">
+          <i className="fa-solid fa-arrow-down-wide-short text-xs"></i>
+        </div>
+        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+          <i className="fa-solid fa-chevron-down text-xs"></i>
+        </div>
       </div>
 
-      {/* Reset Button */}
-      <div className="flex flex-col gap-1">
-        <label className="text-gray-400 text-xs uppercase tracking-wider opacity-0">Reset</label>
+      {(filters.genre || filters.year || filters.sort !== "popularity") && (
         <button
-          onClick={handleReset}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+          onClick={() => {
+            setFilters({ genre: "", year: "", sort: "popularity" });
+            onFilterChange({ genre: "", year: "", sort: "popularity" });
+          }}
+          className={`${isMobile ? "w-full" : ""} bg-gray-700 hover:bg-gray-600 text-white px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2`}
         >
-          <i className="fa-solid fa-rotate-left mr-1"></i> Reset
+          <i className="fa-solid fa-rotate-right"></i>
+          <span>Clear</span>
         </button>
-      </div>
+      )}
     </div>
   );
 };
